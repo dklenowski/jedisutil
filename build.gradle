@@ -1,0 +1,51 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.7
+version = '1.2'
+project.group = 'com.orbious'
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Jedis Utilities'
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+configurations {
+  all*.exclude group: 'javax.mail', module: 'mail'
+  all*.exclude group: 'javax.jms', module: 'jms'
+  all*.exclude group: 'com.sun.jdmk', module: 'jmxtools'
+  all*.exclude group: 'com.sun.jmx', module: 'jmxri'
+}
+
+dependencies {
+    compile group: 'gnu.getopt', name: 'java-getopt', version: '1.0.13'
+    compile group: 'log4j', name: 'log4j', version: '1.2.15'
+    compile group: 'redis.clients', name: 'jedis', version: '2.5.1'
+    compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.2'
+    testCompile group: 'org.testng', name: 'testng', version: '6.1.1'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.1'    
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath)
+        }
+    }
+}
+
+task writecp(mustRunAfter: build) << {
+  String scriptname = "setclasspath.sh"
+  println "Writing classpath to " + scriptname
+
+  File f = new File(scriptname)
+  f.setExecutable(true)
+  f.text = "export CLASSPATH=" + sourceSets.main.runtimeClasspath.collect { it.absolutePath }.join(':') + "\n"
+}

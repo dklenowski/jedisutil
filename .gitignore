@@ -1,0 +1,5 @@
+/setclasspath.sh
+/build
+/bin
+/test-output
+/.gradle
