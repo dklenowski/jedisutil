@@ -35,5 +35,23 @@ public class RedisSetTest {
 
     Assert.assertFalse(rs.contains("5"));
   }
+  
+  @Test
+  public void delete() throws Exception {
+    RedisSet rs = new RedisSet(TestConfig.redis_ip, TestConfig.redis_port, testsetname);
+    rs.connect();
+
+    rs.put("1");
+    Assert.assertTrue(rs.contains("1"));
+
+    rs.put("2");
+    rs.put("3");
+    Assert.assertTrue(rs.contains("2"));
+    Assert.assertTrue(rs.contains("3"));
+
+    rs.delete("2");
+    Assert.assertFalse(rs.contains("2"));
+    Assert.assertTrue(rs.contains("3"));
+  }
 }
 

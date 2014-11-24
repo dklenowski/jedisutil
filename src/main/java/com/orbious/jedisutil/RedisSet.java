@@ -49,17 +49,7 @@ public class RedisSet {
     
     return connected;
   }
-
-//  public synchronized void disconnect()  {
-//    try {
-//      pool.destroy();
-//    } catch ( JedisException je ) { 
-//      logger.warn("failed to destroy jedis pool");
-//    } finally {
-//      pool = null;
-//    }
-//  }
-
+  
   public synchronized boolean contains(String key) {
     logger.debug("searching for key " + key);
     
@@ -82,6 +72,30 @@ public class RedisSet {
     } finally {
       if ( jedis != null ) pool.returnResource(jedis);
     }
+  }
+  
+  public synchronized void delete(String key) {
+    logger.info("deleting key " + key + " from set " + setname);
+    
+    Jedis jedis = null;
+    try {
+      jedis = pool.getResource();
+      jedis.srem(setname, key);
+    } finally {
+      if ( jedis != null ) pool.returnResource(jedis);
+    }
+  }
+  
+  public synchronized Set<String> keys() {
+    logger.debug("retreiving all keys for set " + setname);
+    
+    Jedis jedis = null;
+    try {
+      jedis = pool.getResource();
+      return jedis.keys("*");
+    } finally {
+      if ( jedis != null ) pool.returnResource(jedis);
+    } 
   }
 
   public synchronized void dump(File outputfile) throws IOException {
