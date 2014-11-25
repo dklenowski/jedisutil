@@ -1,15 +1,21 @@
 package com.orbious.jedisutil;
 
+import java.util.HashMap;
+
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
 import redis.clients.jedis.JedisPool;
 
 public class Pool {
 
-  public static JedisPool pool = null;
+  public static HashMap<String, JedisPool> pools = new HashMap<>();
   
   private Pool() { }
   
   public static synchronized JedisPool get(String ip, int port, int timeout) {
+    String id = ip + ":" + port;
+    
+    JedisPool pool =  pools.get(id);
     if ( pool != null ) return pool;
     
     GenericObjectPoolConfig config = new GenericObjectPoolConfig();
@@ -20,6 +26,7 @@ public class Pool {
     config.setMinIdle(500);
     pool = new JedisPool(config, ip, port, timeout);
     
+    pools.put(id, pool);
     return pool;
   }
   
