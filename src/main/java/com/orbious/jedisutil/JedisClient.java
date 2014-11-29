@@ -25,25 +25,15 @@ public class JedisClient {
   public synchronized void connect() throws RedisException { 
     if ( pool != null ) return;
     
-    logger.info("connecting to redis on " + ip + ": " + port);
+    logger.info("connecting to redis on " + ip + ":" + port);
     
-    pool = Pool.get(ip, port);
+    pool = PoolUtil.get(ip, port);
     if ( !PoolUtil.connected(pool) ) 
       throw new RedisException("Failed to connect to redis at " + ip + ": " + port);
   }
   
   public synchronized boolean isConnected() {
-    Jedis jedis = null;
-    boolean connected = false;
-    
-    try {
-      jedis = pool.getResource();
-      connected = jedis.isConnected();
-    } finally {
-      if ( jedis != null ) pool.returnResource(jedis);
-    }
-    
-    return connected;
+    return PoolUtil.connected(pool);
   }
   
   public synchronized String hget(String hashname, String key) {
